@@ -35,14 +35,3 @@ El sistema está conectado a una base de datos en la nube (Supabase), donde se a
 - 📊 Exportación o visualización de reportes (a desarrollar).
 
 ---
-
-## 🧭 Arquitectura General
-
-```mermaid
-graph TD
-  ReactNative[Aplicación Móvil (React Native)]
-  Supabase[Supabase (Auth + Base de Datos)]
-  GPS[Geolocalización (APIs del Dispositivo)]
-
-  ReactNative -->|Autenticación, registros, historial| Supabase
-  ReactNative -->|Obtención de coordenadas GPS| GPS
