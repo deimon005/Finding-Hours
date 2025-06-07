@@ -6,7 +6,15 @@ const Login = () => {
 
   const handleSession = (event) => {
     event.preventDefault(); 
-    navigate('/home'); 
+    
+    const formData = new FormData(event.target);
+    const accountType = formData.get('class');
+
+    if (accountType === 'Empleado') {
+      navigate('/empleado');
+    } else if (accountType === 'Admin') {
+      navigate('/admin');
+    }
   };
 
   return (
@@ -20,6 +28,13 @@ const Login = () => {
         <div className={styles.field}>
           <label htmlFor="password">Contraseña</label>
           <input type="password" id="password" name="password" required />
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="class">Tipo de cuenta</label>
+          <select name="class" id="class">
+            <option value="Empleado">Empleado</option>
+            <option value="Admin">Administrado o RRHH</option>
+          </select>
         </div>
         <button type="submit">Iniciar Sesión</button>
       </form>
