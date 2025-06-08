@@ -8,7 +8,7 @@ const Login = () => {
     event.preventDefault(); 
     
     const formData = new FormData(event.target);
-    const accountType = formData.get('class');
+    const accountType = formData.get('rol');
 
     if (accountType === 'Empleado') {
       navigate('/empleado');
@@ -30,14 +30,15 @@ const Login = () => {
           <input type="password" id="password" name="password" required />
         </div>
         <div className={styles.field}>
-          <label htmlFor="class">Tipo de cuenta</label>
-          <select name="class" id="class">
+          <label htmlFor="Rol">Rol</label>
+          <select name="Rol" id="Rol">
             <option value="Empleado">Empleado</option>
             <option value="Admin">Administrado o RRHH</option>
           </select>
         </div>
         <button type="submit">Iniciar Sesión</button>
       </form>
+      <h5>No tienes una cuenta, <a href="/register">Registrate aqui</a></h5>
     </section>
   );
 };
