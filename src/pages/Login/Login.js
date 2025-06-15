@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; // ✅ Import correcto
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
+import supabase from '../../../lib/supabase';
 
 const Login = () => {
   const navigation = useNavigation();
@@ -9,7 +10,26 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [rol, setRol] = useState('Empleado');
 
-  const handleSession = () => {
+  const handleSession = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Debes completar todos los campos');
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('usuario')
+      .select('*')
+      .eq('email', email)
+      .eq('password', password)
+      .eq('rol', rol)
+      .single(); // Esperamos un único resultado
+
+    if (error || !data) {
+      Alert.alert('Error', 'Credenciales incorrectas o usuario no encontrado');
+      return;
+    }
+
+    // Navegar según rol
     if (rol === 'Empleado') {
       navigation.navigate('Empleado');
     } else if (rol === 'Admin') {
@@ -28,6 +48,7 @@ const Login = () => {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        placeholder="usuario@correo.com"
       />
 
       <Text style={styles.label}>Contraseña</Text>
@@ -36,6 +57,7 @@ const Login = () => {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        placeholder="••••••"
       />
 
       <Text style={styles.label}>Rol</Text>
@@ -45,15 +67,13 @@ const Login = () => {
         style={styles.input}
       >
         <Picker.Item label="Empleado" value="Empleado" />
-        <Picker.Item label="Admin" value="Admin" />
+        <Picker.Item label="Admin o RRHH" value="Admin" />
       </Picker>
 
       <Button title="Iniciar Sesión" onPress={handleSession} />
 
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-        <Text style={styles.registerText}>
-          No tienes una cuenta, Registrate aquí
-        </Text>
+        <Text style={styles.registerText}>No tienes una cuenta, regístrate aquí</Text>
       </TouchableOpacity>
     </View>
   );

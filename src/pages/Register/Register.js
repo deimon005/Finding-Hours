@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; // ✅ IMPORT CORRECTO
+import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
+import supabase from '../../../lib/supabase';
+
 
 const Register = () => {
   const navigation = useNavigation();
@@ -12,9 +14,29 @@ const Register = () => {
     rol: 'Empleado',
   });
 
-  const handleRegister = () => {
-    Alert.alert('Registro exitoso');
-    navigation.navigate('Login');
+  const handleRegister = async () => {
+    if (!form.name || !form.email || !form.password) {
+      Alert.alert('Error', 'Completa todos los campos');
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('usuario')
+      .insert([
+        {
+          nombre: form.name,
+          email: form.email,
+          rol: form.rol,
+          password: form.password,
+        },
+      ]);
+
+    if (error) {
+      Alert.alert('Error', error.message);
+    } else {
+      Alert.alert('Éxito', 'Usuario registrado correctamente');
+      navigation.navigate('Login');
+    }
   };
 
   return (
