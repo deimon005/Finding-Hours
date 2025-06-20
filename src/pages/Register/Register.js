@@ -1,8 +1,9 @@
-// src/pages/Register.js
+// src/pages/Register/Register.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../../context/AuthContext';
 
 const Register = () => {
   const navigation = useNavigation();
@@ -12,11 +13,21 @@ const Register = () => {
     password: '',
     rol: 'Empleado',
   });
+  const { register, loading } = useAuth();
 
-  const handleRegister = () => {
-    // Aquí llamarías a tu API de Supabase para crear el usuario...
-    Alert.alert('Registro exitoso');
-    navigation.navigate('Login');
+  const handleRegister = async () => {
+    try {
+      await register(form.email, form.password, {
+        name: form.name,
+        rol: form.rol,
+      });
+
+      Alert.alert('Registro exitoso', 'Confirma tu correo antes de iniciar sesión.', [
+        { text: 'OK', onPress: () => navigation.navigate('Login') },
+      ]);
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Hubo un problema al registrarse');
+    }
   };
 
   return (
@@ -60,7 +71,11 @@ const Register = () => {
         <Picker.Item label="Admin o RRHH" value="Admin" />
       </Picker>
 
-      <Button title="Registrarse" onPress={handleRegister} />
+      <Button 
+        title={loading ? "Registrando..." : "Registrarse"} 
+        onPress={handleRegister} 
+        disabled={loading}
+      />
     </View>
   );
 };
@@ -70,8 +85,14 @@ const styles = StyleSheet.create({
     width: '90%',
     alignSelf: 'center',
     padding: 24,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
     elevation: 4,
   },
   title: {
@@ -91,8 +112,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 4,
+    fontSize: 16,
     marginTop: 4,
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
   },
 });
 
