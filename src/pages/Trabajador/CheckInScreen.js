@@ -30,35 +30,50 @@ export default function CheckInScreen() {
         return;
       }
 
+      // Obtener id_usuario a partir del auth_id (user.id)
+      const { data: userData, error: userError } = await supabase
+        .from('usuario')
+        .select('id_usuario')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) {
+        console.error('Error obteniendo id_usuario:', userError);
+        Alert.alert('Error', 'No se pudo encontrar el usuario en la base de datos');
+        setLoading(false);
+        return;
+      }
+
+      const id_usuario = userData.id_usuario;
       const { latitude, longitude } = location.coords;
-      const hora = new Date().toISOString();
-      const aprobado = true;
 
       const { data, error } = await supabase
-        .from('Registro') 
+        .from('registro')
         .insert([{
           latitud: latitude,
           longitud: longitude,
-          id_usuario: user.id_usuario || user.id,
-          hora,
-          entrada: true,
-          salida: false,
+          id_usuario: id_usuario,
+          hora: new Date().toISOString(),
+          entrada: new Date().toISOString(),
+          salida: null,
           direccion_esperada: 'Oficina Central',
-          ratio_permitido: 50,
-          aprobado,
-          comentario: '',
+          radio_permitido: 50,
+          aprobado: true,
+          comentarios: ''
         }]);
 
       if (error) {
-        console.error('Error insertando registro:', JSON.stringify(error, null, 2));
+        console.error('Error insertando registro:', error);
         Alert.alert('Error', 'No se pudo guardar el registro');
       } else {
         Alert.alert('Éxito', 'Registro guardado correctamente');
       }
+
     } catch (error) {
       setErrorMsg('Error obteniendo ubicación');
       console.error(error);
     }
+
     setLoading(false);
   };
 
@@ -70,14 +85,12 @@ export default function CheckInScreen() {
         onPress={handleGetLocation}
         disabled={loading}
       />
-
       {location && (
         <Text style={styles.location}>
           Latitud: {location.coords.latitude}{"\n"}
           Longitud: {location.coords.longitude}
         </Text>
       )}
-
       {errorMsg && <Text style={styles.error}>{errorMsg}</Text>}
     </View>
   );
