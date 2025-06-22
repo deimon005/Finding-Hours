@@ -1,9 +1,9 @@
+// src/pages/Register/Register.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
-import supabase from '../../../lib/supabase';
-
+import { useAuth } from '../../../context/AuthContext';
 
 const Register = () => {
   const navigation = useNavigation();
@@ -13,29 +13,20 @@ const Register = () => {
     password: '',
     rol: 'Empleado',
   });
+  const { register, loading } = useAuth();
 
   const handleRegister = async () => {
-    if (!form.name || !form.email || !form.password) {
-      Alert.alert('Error', 'Completa todos los campos');
-      return;
-    }
+    try {
+      await register(form.email, form.password, {
+        name: form.name,
+        rol: form.rol,
+      });
 
-    const { data, error } = await supabase
-      .from('usuario')
-      .insert([
-        {
-          nombre: form.name,
-          email: form.email,
-          rol: form.rol,
-          password: form.password,
-        },
+      Alert.alert('Registro exitoso', 'Confirma tu correo antes de iniciar sesión.', [
+        { text: 'OK', onPress: () => navigation.navigate('Login') },
       ]);
-
-    if (error) {
-      Alert.alert('Error', error.message);
-    } else {
-      Alert.alert('Éxito', 'Usuario registrado correctamente');
-      navigation.navigate('Login');
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Hubo un problema al registrarse');
     }
   };
 
@@ -80,7 +71,11 @@ const Register = () => {
         <Picker.Item label="Admin o RRHH" value="Admin" />
       </Picker>
 
-      <Button title="Registrarse" onPress={handleRegister} />
+      <Button 
+        title={loading ? "Registrando..." : "Registrarse"} 
+        onPress={handleRegister} 
+        disabled={loading}
+      />
     </View>
   );
 };

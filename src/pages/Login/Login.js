@@ -2,38 +2,21 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
-import supabase from '../../../lib/supabase';
+import { useAuth } from '../../../context/AuthContext';
 
 const Login = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rol, setRol] = useState('Empleado');
+  const { login, loading } = useAuth();
 
   const handleSession = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Debes completar todos los campos');
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from('usuario')
-      .select('*')
-      .eq('email', email)
-      .eq('password', password)
-      .eq('rol', rol)
-      .single(); // Esperamos un único resultado
-
-    if (error || !data) {
-      Alert.alert('Error', 'Credenciales incorrectas o usuario no encontrado');
-      return;
-    }
-
-    // Navegar según rol
-    if (rol === 'Empleado') {
-      navigation.navigate('Empleado');
-    } else if (rol === 'Admin') {
-      navigation.navigate('Admin');
+    try {
+      await login(email, password);
+      navigation.replace('Redirect'); 
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Credenciales incorrectas');
     }
   };
 
@@ -63,14 +46,18 @@ const Login = () => {
       <Text style={styles.label}>Rol</Text>
       <Picker
         selectedValue={rol}
-        onValueChange={(itemValue) => setRol(itemValue)}
+        onValueChange={setRol}
         style={styles.input}
       >
         <Picker.Item label="Empleado" value="Empleado" />
         <Picker.Item label="Admin o RRHH" value="Admin" />
       </Picker>
 
-      <Button title="Iniciar Sesión" onPress={handleSession} />
+      <Button 
+        title={loading ? "Iniciando sesión..." : "Iniciar Sesión"} 
+        onPress={handleSession} 
+        disabled={loading}
+      />
 
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={styles.registerText}>No tienes una cuenta, regístrate aquí</Text>
