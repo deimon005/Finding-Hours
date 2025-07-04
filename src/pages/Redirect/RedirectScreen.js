@@ -20,7 +20,6 @@ const RedirectScreen = () => {
           routes: [{ name: 'Empleado' }],
         });
       } else {
-
         navigation.reset({
           index: 0,
           routes: [{ name: 'Login' }],
@@ -31,7 +30,7 @@ const RedirectScreen = () => {
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" />
+      <ActivityIndicator size="large" color="#2EC4B6" />
       <Text style={styles.text}>Redirigiendo según tu rol...</Text>
     </View>
   );
@@ -40,13 +39,17 @@ const RedirectScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 24,
   },
   text: {
-    marginTop: 10,
+    marginTop: 16,
     fontSize: 16,
+    color: '#1B263B',
+    fontWeight: '500',
+    textAlign: 'center',
   },
 });
 

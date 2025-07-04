@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../../context/AuthContext';
@@ -14,7 +21,7 @@ const Login = () => {
   const handleSession = async () => {
     try {
       await login(email, password);
-      navigation.replace('Redirect'); 
+      navigation.replace('Redirect');
     } catch (error) {
       Alert.alert('Error', error.message || 'Credenciales incorrectas');
     }
@@ -22,6 +29,7 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.greeting}>Bienvenido</Text>
       <Text style={styles.title}>Inicio de Sesión</Text>
 
       <Text style={styles.label}>Correo Electrónico</Text>
@@ -32,6 +40,7 @@ const Login = () => {
         keyboardType="email-address"
         autoCapitalize="none"
         placeholder="usuario@correo.com"
+        placeholderTextColor="#999"
       />
 
       <Text style={styles.label}>Contraseña</Text>
@@ -41,6 +50,7 @@ const Login = () => {
         onChangeText={setPassword}
         secureTextEntry
         placeholder="••••••"
+        placeholderTextColor="#999"
       />
 
       <Text style={styles.label}>Rol</Text>
@@ -53,14 +63,23 @@ const Login = () => {
         <Picker.Item label="Admin o RRHH" value="Admin" />
       </Picker>
 
-      <Button 
-        title={loading ? "Iniciando sesión..." : "Iniciar Sesión"} 
-        onPress={handleSession} 
+      <TouchableOpacity
+        onPress={handleSession}
         disabled={loading}
-      />
+        style={[
+          styles.button,
+          loading && styles.buttonDisabled,
+        ]}
+      >
+        <Text style={styles.buttonText}>
+          {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+        </Text>
+      </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-        <Text style={styles.registerText}>No tienes una cuenta, regístrate aquí</Text>
+        <Text style={styles.registerText}>
+          No tienes una cuenta, regístrate aquí
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -68,31 +87,65 @@ const Login = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
     flex: 1,
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  greeting: {
+    fontSize: 24,
+    color: '#1B263B',
+    fontWeight: '600',
+    marginBottom: 8,
   },
   title: {
-    fontSize: 24,
-    marginBottom: 20,
-    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: '500',
+    color: '#3D5A80',
+    marginBottom: 16,
   },
   label: {
-    marginTop: 10,
-    fontWeight: 'bold',
+    alignSelf: 'flex-start',
+    marginBottom: 4,
+    fontWeight: '500',
+    fontSize: 14,
+    color: '#1B263B',
   },
   input: {
+    width: '100%',
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginTop: 5,
+    borderColor: '#CCC',
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    marginBottom: 20,
+    backgroundColor: '#F9F9F9',
+    color: '#333',
+  },
+  button: {
+    backgroundColor: '#2EC4B6',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    elevation: 4,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  buttonDisabled: {
+    backgroundColor: '#88CCC9',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 16,
   },
   registerText: {
-    marginTop: 20,
     color: '#007bff',
     textAlign: 'center',
+    fontSize: 14,
   },
 });
 

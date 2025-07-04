@@ -1,6 +1,13 @@
 // src/pages/Register/Register.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../../context/AuthContext';
@@ -32,12 +39,14 @@ const Register = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.greeting}>¡Bienvenido!</Text>
       <Text style={styles.title}>Registro de usuario</Text>
 
       <Text style={styles.label}>Nombre</Text>
       <TextInput
         style={styles.input}
         placeholder="Ingrese su nombre"
+        placeholderTextColor="#999"
         value={form.name}
         onChangeText={(text) => setForm({ ...form, name: text })}
       />
@@ -46,6 +55,7 @@ const Register = () => {
       <TextInput
         style={styles.input}
         placeholder="Ingrese su correo"
+        placeholderTextColor="#999"
         keyboardType="email-address"
         autoCapitalize="none"
         value={form.email}
@@ -56,6 +66,7 @@ const Register = () => {
       <TextInput
         style={styles.input}
         placeholder="Ingrese su contraseña"
+        placeholderTextColor="#999"
         secureTextEntry
         value={form.password}
         onChangeText={(text) => setForm({ ...form, password: text })}
@@ -71,50 +82,78 @@ const Register = () => {
         <Picker.Item label="Admin o RRHH" value="Admin" />
       </Picker>
 
-      <Button 
-        title={loading ? "Registrando..." : "Registrarse"} 
-        onPress={handleRegister} 
+      <TouchableOpacity
+        onPress={handleRegister}
         disabled={loading}
-      />
+        style={[
+          styles.button,
+          loading && styles.buttonDisabled,
+        ]}
+      >
+        <Text style={styles.buttonText}>
+          {loading ? 'Registrando...' : 'Registrarse'}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    width: '90%',
-    alignSelf: 'center',
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 24,
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 4,
+  },
+  greeting: {
+    fontSize: 24,
+    color: '#1B263B',
+    fontWeight: '600',
+    marginBottom: 8,
   },
   title: {
-    fontSize: 22,
-    marginBottom: 20,
-    textAlign: 'center',
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '500',
+    color: '#3D5A80',
+    marginBottom: 16,
   },
   label: {
-    marginTop: 12,
+    alignSelf: 'flex-start',
+    marginBottom: 4,
     fontWeight: '500',
     fontSize: 14,
+    color: '#1B263B',
   },
   input: {
     width: '100%',
-    padding: 8,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
+    borderColor: '#CCC',
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     fontSize: 16,
-    marginTop: 4,
-    backgroundColor: 'white',
+    marginBottom: 20,
+    backgroundColor: '#F9F9F9',
+    color: '#333',
+  },
+  button: {
+    backgroundColor: '#2EC4B6',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    elevation: 4,
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonDisabled: {
+    backgroundColor: '#88CCC9',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 16,
   },
 });
 
