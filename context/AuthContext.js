@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
     checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (_event, session) => {
         if (session?.user) {
           await fetchUserProfile(session.user);
         } else {
@@ -41,15 +41,21 @@ export const AuthProvider = ({ children }) => {
         .from('usuario')
         .select('*')
         .eq('auth_id', authUser.id)
-        .single();
+        .maybeSingle(); // ✅ evita error si no hay perfil
 
       if (error) throw error;
 
+      if (!data) {
+        console.warn('⚠️ Perfil no encontrado para el usuario:', authUser.id);
+        setUser(authUser); // 👈 aún puedes guardar el authUser parcial
+        return;
+      }
+
       const fullUser = { ...authUser, ...data };
       setUser(fullUser);
-      console.log('✅ Usuario autenticado:', fullUser); // Para F12
+      console.log('✅ Usuario autenticado:', fullUser);
     } catch (error) {
-      console.error('Error al obtener perfil de usuario:', error);
+      console.error('❌ Error al obtener perfil de usuario:', error);
       setUser(null);
     }
   };
@@ -69,10 +75,9 @@ export const AuthProvider = ({ children }) => {
         throw error;
       }
 
-      // El perfil será cargado desde onAuthStateChange
-      return data.user;
+      return data.user; // perfil será cargado por onAuthStateChange
     } catch (error) {
-      console.error('Error en login:', error);
+      console.error('❌ Error en login:', error);
       throw error;
     } finally {
       setLoading(false);
@@ -101,10 +106,9 @@ export const AuthProvider = ({ children }) => {
       if (profileError) throw profileError;
 
       Alert.alert("Confirma tu correo", "Revisa tu correo para completar el registro.");
-
       return authData.user;
     } catch (error) {
-      console.error('Error al registrar:', error);
+      console.error('❌ Error al registrar:', error);
       throw error;
     } finally {
       setLoading(false);
@@ -118,7 +122,7 @@ export const AuthProvider = ({ children }) => {
       if (error) throw error;
       setUser(null);
     } catch (error) {
-      console.error('Error al cerrar sesión:', error);
+      console.error('❌ Error al cerrar sesión:', error);
       throw error;
     } finally {
       setLoading(false);
@@ -134,7 +138,7 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth debe usarse dentro de AuthProvider');
   }
   return context;
