@@ -1,37 +1,46 @@
+// Importaciones necesarias desde React y React Native
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import {View,Text,TextInput,StyleSheet,TouchableOpacity,Alert,} from 'react-native';
+
+// Picker para selección de roles
 import { Picker } from '@react-native-picker/picker';
+
+// Navegación entre pantallas
 import { useNavigation } from '@react-navigation/native';
+
+// Contexto de autenticación (custom hook)
 import { useAuth } from '../../../context/AuthContext';
 
+// Componente principal de Login
 const Login = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation(); // Hook para navegación entre pantallas
+
+  // Estados para el formulario
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rol, setRol] = useState('Empleado');
+  const [rol, setRol] = useState('Empleado'); // Valor inicial del picker
+
+  // Funciones del contexto de autenticación
   const { login, loading } = useAuth();
 
+  // Maneja el inicio de sesión
   const handleSession = async () => {
     try {
-      await login(email, password);
-      navigation.replace('Redirect');
+      await login(email, password); // Intenta iniciar sesión con las credenciales
+      navigation.replace('Redirect'); // Redirige si es exitoso
     } catch (error) {
+      // Muestra alerta en caso de error
       Alert.alert('Error', error.message || 'Credenciales incorrectas');
     }
   };
 
   return (
     <View style={styles.container}>
+      {/* Título y subtítulo */}
       <Text style={styles.greeting}>Bienvenido</Text>
       <Text style={styles.title}>Inicio de Sesión</Text>
 
+      {/* Campo de correo */}
       <Text style={styles.label}>Correo Electrónico</Text>
       <TextInput
         style={styles.input}
@@ -43,6 +52,7 @@ const Login = () => {
         placeholderTextColor="#999"
       />
 
+      {/* Campo de contraseña */}
       <Text style={styles.label}>Contraseña</Text>
       <TextInput
         style={styles.input}
@@ -53,6 +63,7 @@ const Login = () => {
         placeholderTextColor="#999"
       />
 
+      {/* Selector de rol */}
       <Text style={styles.label}>Rol</Text>
       <Picker
         selectedValue={rol}
@@ -63,6 +74,7 @@ const Login = () => {
         <Picker.Item label="Admin o RRHH" value="Admin" />
       </Picker>
 
+      {/* Botón para iniciar sesión */}
       <TouchableOpacity
         onPress={handleSession}
         disabled={loading}
@@ -76,6 +88,7 @@ const Login = () => {
         </Text>
       </TouchableOpacity>
 
+      {/* Enlace a pantalla de registro */}
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={styles.registerText}>
           No tienes una cuenta, regístrate aquí
@@ -85,6 +98,7 @@ const Login = () => {
   );
 };
 
+// Estilos de la interfaz
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -149,4 +163,5 @@ const styles = StyleSheet.create({
   },
 });
 
+// Exporta el componente como default
 export default Login;

@@ -1,31 +1,28 @@
+// Importaciones necesarias
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native';
-import * as Location from 'expo-location';
-import { useAuth } from '../../../context/AuthContext';
-import supabase from '../../../lib/supabase';
+import {View,Text,StyleSheet,Alert,ActivityIndicator,TouchableOpacity,TextInput,} from 'react-native';
+import * as Location from 'expo-location'; // API para obtener ubicación del dispositivo
+import { useAuth } from '../../../context/AuthContext'; // Hook de autenticación personalizado
+import supabase from '../../../lib/supabase'; // Cliente Supabase configurado
 
+// Componente principal
 export default function CheckInScreen() {
-  const [location, setLocation] = useState(null);
-  const [ciudad, setCiudad] = useState('');
-  const [errorMsg, setErrorMsg] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [nombre, setNombre] = useState('');
-  const [comentario, setComentario] = useState('');
-  const [modoSalida, setModoSalida] = useState(false);
-  const { user } = useAuth();
+  // Estados de la pantalla
+  const [location, setLocation] = useState(null); // Coordenadas GPS
+  const [ciudad, setCiudad] = useState(''); // Nombre de la ciudad geolocalizada
+  const [errorMsg, setErrorMsg] = useState(null); // Mensaje de error
+  const [loading, setLoading] = useState(false); // Indicador de carga
+  const [nombre, setNombre] = useState(''); // Nombre del usuario autenticado
+  const [comentario, setComentario] = useState(''); // Comentario opcional del usuario
+  const [modoSalida, setModoSalida] = useState(false); // Define si es entrada o salida
+  const { user } = useAuth(); // Usuario autenticado actual
 
+  // Hook para cargar ubicación y datos del usuario al iniciar la pantalla
   useEffect(() => {
     const init = async () => {
       if (!user) return;
 
+      // Obtener el nombre del usuario desde la tabla 'usuario'
       const { data, error } = await supabase
         .from('usuario')
         .select('nombre')
@@ -39,18 +36,20 @@ export default function CheckInScreen() {
         setNombre(data.nombre);
       }
 
+      // Solicitar permiso de ubicación al usuario
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setErrorMsg('Permiso denegado para acceder a la ubicación');
         return;
       }
 
+      // Obtener ubicación actual con alta precisión
       const loc = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
-
       setLocation(loc);
 
+      // Obtener dirección legible desde coordenadas
       const geocoded = await Location.reverseGeocodeAsync({
         latitude: loc.coords.latitude,
         longitude: loc.coords.longitude,
@@ -63,9 +62,10 @@ export default function CheckInScreen() {
       }
     };
 
-    init();
+    init(); // Llamada inmediata a la función
   }, [user]);
 
+  // Función principal para registrar entrada o salida
   const handleGetLocation = async () => {
     setLoading(true);
     setErrorMsg(null);
@@ -76,6 +76,7 @@ export default function CheckInScreen() {
         return;
       }
 
+      // Obtener ID interno del usuario en Supabase
       const { data: userData, error: userError } = await supabase
         .from('usuario')
         .select('id_usuario')
@@ -91,6 +92,7 @@ export default function CheckInScreen() {
 
       if (modoSalida) {
         // 🔁 Marcar SALIDA
+        // Buscar el último registro sin salida
         const { data: registros, error: fetchError } = await supabase
           .from('registro')
           .select('id_registro')
@@ -106,6 +108,7 @@ export default function CheckInScreen() {
 
         const registroId = registros[0].id_registro;
 
+        // Actualizar el registro con la hora de salida
         const { error: updateError } = await supabase
           .from('registro')
           .update({
@@ -119,11 +122,12 @@ export default function CheckInScreen() {
         } else {
           Alert.alert('Éxito', 'Salida registrada correctamente.');
           setComentario('');
-          setModoSalida(false);
+          setModoSalida(false); // Resetear modo
         }
 
       } else {
         // 🟢 Marcar ENTRADA
+        // Verificar si ya hay una entrada sin salida
         const { data: abiertos, error: abiertosError } = await supabase
           .from('registro')
           .select('id_registro')
@@ -141,6 +145,7 @@ export default function CheckInScreen() {
           return;
         }
 
+        // Insertar nuevo registro de entrada
         const { error: insertError } = await supabase.from('registro').insert([{
           latitud: latitude,
           longitud: longitude,
@@ -170,6 +175,7 @@ export default function CheckInScreen() {
     }
   };
 
+  // Función para cerrar sesión
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -177,6 +183,7 @@ export default function CheckInScreen() {
     }
   };
 
+  // UI principal
   return (
     <View style={styles.container}>
       <Text style={styles.greeting}>
@@ -185,6 +192,7 @@ export default function CheckInScreen() {
 
       <Text style={styles.title}>Registro de Asistencia</Text>
 
+      {/* Campo de comentarios opcionales */}
       <TextInput
         style={styles.input}
         placeholder="Comentarios (opcional)"
@@ -193,6 +201,7 @@ export default function CheckInScreen() {
         onChangeText={setComentario}
       />
 
+      {/* Botones para marcar entrada o salida */}
       <View style={styles.buttonGroup}>
         <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
@@ -217,8 +226,10 @@ export default function CheckInScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Cargando */}
       {loading && <ActivityIndicator color="#000" style={{ marginTop: 10 }} />}
 
+      {/* Muestra la ubicación y ciudad actual */}
       {location && (
         <Text style={styles.location}>
           📍 Latitud: {location.coords.latitude.toFixed(5)}{'\n'}
@@ -227,8 +238,10 @@ export default function CheckInScreen() {
         </Text>
       )}
 
+      {/* Error al obtener permisos de ubicación */}
       {errorMsg && <Text style={styles.error}>{errorMsg}</Text>}
 
+      {/* Botón de cerrar sesión */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutText}>Cerrar sesión</Text>
       </TouchableOpacity>
@@ -236,6 +249,7 @@ export default function CheckInScreen() {
   );
 }
 
+// Estilos del componente
 const styles = StyleSheet.create({
   container: {
     flex: 1,

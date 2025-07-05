@@ -1,47 +1,58 @@
-// src/pages/Register/Register.js
+// Importaciones necesarias desde React y React Native
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import {View,Text,TextInput,TouchableOpacity,StyleSheet,Alert,} from 'react-native';
+
+// Componente Picker para selección de rol
 import { Picker } from '@react-native-picker/picker';
+
+// Hook de navegación entre pantallas
 import { useNavigation } from '@react-navigation/native';
+
+// Hook de contexto personalizado para autenticación
 import { useAuth } from '../../../context/AuthContext';
 
+// Componente principal para registro de usuario
 const Register = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation(); // Permite navegar entre pantallas
+
+  // Estado local del formulario con campos: nombre, email, contraseña y rol
   const [form, setForm] = useState({
     name: '',
     email: '',
     password: '',
-    rol: 'Empleado',
+    rol: 'Empleado', // Valor por defecto del rol
   });
+
+  // Función y estado de carga desde el contexto de autenticación
   const { register, loading } = useAuth();
 
+  // Función que maneja el registro del usuario
   const handleRegister = async () => {
     try {
+      // Llama a la función register del contexto con email, password y metadatos adicionales
       await register(form.email, form.password, {
         name: form.name,
         rol: form.rol,
       });
 
+      // Si tiene éxito, muestra alerta y redirige al login
       Alert.alert('Registro exitoso', 'Confirma tu correo antes de iniciar sesión.', [
         { text: 'OK', onPress: () => navigation.navigate('Login') },
       ]);
     } catch (error) {
+      // Muestra un mensaje de error en caso de fallar
       Alert.alert('Error', error.message || 'Hubo un problema al registrarse');
     }
   };
 
+  // Render del componente
   return (
     <View style={styles.container}>
+      {/* Encabezado de bienvenida */}
       <Text style={styles.greeting}>¡Bienvenido!</Text>
       <Text style={styles.title}>Registro de usuario</Text>
 
+      {/* Campo para nombre */}
       <Text style={styles.label}>Nombre</Text>
       <TextInput
         style={styles.input}
@@ -51,6 +62,7 @@ const Register = () => {
         onChangeText={(text) => setForm({ ...form, name: text })}
       />
 
+      {/* Campo para correo electrónico */}
       <Text style={styles.label}>Correo electrónico</Text>
       <TextInput
         style={styles.input}
@@ -62,6 +74,7 @@ const Register = () => {
         onChangeText={(text) => setForm({ ...form, email: text })}
       />
 
+      {/* Campo para contraseña */}
       <Text style={styles.label}>Contraseña</Text>
       <TextInput
         style={styles.input}
@@ -72,6 +85,7 @@ const Register = () => {
         onChangeText={(text) => setForm({ ...form, password: text })}
       />
 
+      {/* Selector de rol (Empleado o Admin) */}
       <Text style={styles.label}>Rol</Text>
       <Picker
         selectedValue={form.rol}
@@ -82,12 +96,13 @@ const Register = () => {
         <Picker.Item label="Admin o RRHH" value="Admin" />
       </Picker>
 
+      {/* Botón de registro */}
       <TouchableOpacity
         onPress={handleRegister}
         disabled={loading}
         style={[
           styles.button,
-          loading && styles.buttonDisabled,
+          loading && styles.buttonDisabled, // Estilo adicional si está cargando
         ]}
       >
         <Text style={styles.buttonText}>
@@ -98,6 +113,7 @@ const Register = () => {
   );
 };
 
+// Estilos del componente
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -157,4 +173,5 @@ const styles = StyleSheet.create({
   },
 });
 
+// Exportación del componente Register
 export default Register;
