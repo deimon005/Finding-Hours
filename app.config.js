@@ -30,14 +30,14 @@ export default {
       supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
       supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
       eas: {
-        projectId: "your-eas-project-id" // Opcional: Si usas EAS Build
+        projectId: "your-eas-project-id" 
       }
     },
     plugins: [
-      // Plugins adicionales si los necesitas
+      
     ],
     runtimeVersion: {
-      policy: "sdkVersion" // o "nativeVersion" si haces builds nativos
+      policy: "sdkVersion" 
     }
   }
 };

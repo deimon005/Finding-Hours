@@ -1,4 +1,3 @@
-// src/pages/Redirect/RedirectScreen.js
 import React, { useEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -21,7 +20,7 @@ const RedirectScreen = () => {
           routes: [{ name: 'Empleado' }],
         });
       } else {
-        // Por si el rol es desconocido o null
+
         navigation.reset({
           index: 0,
           routes: [{ name: 'Login' }],
