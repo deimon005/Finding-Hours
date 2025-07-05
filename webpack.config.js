@@ -12,17 +12,22 @@ module.exports = async function (env, argv) {
     buffer: require.resolve('buffer'),
     process: require.resolve('process/browser'),
     util: require.resolve('util'),
-    vm: false, // 👈 importante para el error de require de "vm"
+    vm: false,
     fs: false,
-    path: false
+    path: false,
+    http: false,
+    https: false,
+    net: false,
+    tls: false,
+    zlib: false,
   };
 
   config.plugins = [
     ...(config.plugins || []),
     new webpack.ProvidePlugin({
+      process: 'process/browser',
       Buffer: ['buffer', 'Buffer'],
-      process: 'process/browser'
-    })
+    }),
   ];
 
   return config;
