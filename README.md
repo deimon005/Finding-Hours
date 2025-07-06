@@ -36,7 +36,7 @@ El sistema está conectado a una base de datos en la nube (Supabase), donde se a
 
 ---
 Como ingresar a la aplicacion
--Paso 1:
+- Paso 1:
 - acceder al link de descarga para dispositivos android
 - https://expo.dev/artifacts/eas/drfM8ord3xSjYPN4zywWz1.apk
 - la descarga iniciara instantaneamente y se debe instalar(puede que sea detectada como aplicacion peligrosa, esto solo ocurre porque es una aplicacion externa a google play)
@@ -54,3 +54,6 @@ Como ingresar a la aplicacion
 2) si se inicia como administrador se podra ver una lista con todos los trabajadores registrados para la empresa.
 3) si se hace click en uno de los trabajadores se entrara a una ventana la cual permite ver un historial de todos sus turnos y negarlos si se ve un comportamiento extraño sease este una ubicacion externa a donde deberia estar.
 - PD: en el informe habran correos con diferentes roles por si encuentra tedioso la creacion de una cuenta, no las pondremos aca por seguridad de nuestros datos.
+- si se quiere ingresar a traves del computador debe situarse en la branch quezada, asegurarse de tener las librerias con npm install
+-  luego correr el comando: npx expo start --web --port 9010
+-  se debe cambiar el port en caso de que no se cierre la sesion, son errores que surjen por usar la forma web de la aplicacion pues esta esta pensada para dispositivos moviles
